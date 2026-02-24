@@ -24,7 +24,7 @@ i18next.init({
 				greeting:
 					"Willkommen <0>{{name}}</0>.<1/>Du wirst <2>{{action}}</2> glauben, was als Nächstes passiert.<3/> {{value}}",
 				action: "niemals",
-				currentDate: "Aktuelles Datum: <0></0>",
+				currentDate: "Aktuelles Datum: <0>hi</0>",
 				lang: {
 					german: "Deutsch",
 					english: "Englisch",

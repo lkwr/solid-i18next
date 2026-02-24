@@ -11,10 +11,7 @@ import {
 import { createStore } from "solid-js/store";
 
 const TranslateContext = createContext<
-	| {
-			registerVariable: (name: string, value: unknown) => void;
-	  }
-	| undefined
+	((name: string, value: unknown) => void) | undefined
 >(undefined);
 
 export type TranslatedJsxProps = {
@@ -34,9 +31,7 @@ export const TranslatedJsx: Component<TranslatedJsxProps> = (props) => {
 		});
 
 	const resolved = children(() => (
-		<TranslateContext.Provider
-			value={{ registerVariable: (key, value) => setVariables(key, value) }}
-		>
+		<TranslateContext.Provider value={(key, value) => setVariables(key, value)}>
 			{props.children}
 		</TranslateContext.Provider>
 	));
@@ -56,7 +51,7 @@ export const TranslatedJsx: Component<TranslatedJsxProps> = (props) => {
 
 			if (token.length === 2) {
 				const [index, content] = token;
-				const element = elements[index].cloneNode(true);
+				const element = elements[index];
 
 				element.textContent = content;
 				result.push(element);
@@ -65,8 +60,9 @@ export const TranslatedJsx: Component<TranslatedJsxProps> = (props) => {
 
 			if (token.length === 1) {
 				const [index] = token;
-				const element = elements[index].cloneNode(false);
+				const element = elements[index];
 
+				element.textContent = "";
 				result.push(element);
 			}
 		}
@@ -87,13 +83,13 @@ export function variable(
 	arg1: Record<string, unknown> | string,
 	arg2?: unknown,
 ): JSX.Element {
-	const ctx = useContext(TranslateContext);
+	const registerVariable = useContext(TranslateContext);
 
 	const [key, value] =
 		typeof arg1 === "string" ? [arg1, arg2] : Object.entries(arg1)[0];
 	const resolvedValue = typeof value === "function" ? value() : value;
 
-	ctx?.registerVariable(key, resolvedValue);
+	registerVariable?.(key, resolvedValue);
 
 	return resolvedValue;
 }
