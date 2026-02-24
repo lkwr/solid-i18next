@@ -25,6 +25,7 @@ export const useI18n = (): i18n => {
 	return useContext(TransContext);
 };
 
+// Add suspense for loading?
 export const useT = (): TFunction => {
 	const i18n = useI18n();
 

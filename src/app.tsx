@@ -1,26 +1,61 @@
-import type { JSX } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
+import { useT } from "./i18n/context.tsx";
 import { Trans } from "./i18n/trans.tsx";
-import { useT } from "./i18n/trans-provider.tsx";
 import { variable } from "./i18n/translate-jsx.tsx";
 import { i18n } from "./i18next.ts";
 
-type A = JSX.Element;
+const names = [
+	"John",
+	"Jane",
+	"Doe",
+	"Smith",
+	"Alice",
+	"Bob",
+	"Charlie",
+	"Eve",
+	"Frank",
+	"Grace",
+	"Heidi",
+	"Ivan",
+	"Judy",
+	"Ken",
+	"Leo",
+];
+
+const getName = () => names[Math.floor(Math.random() * names.length)];
 
 export const App = () => {
+	const [name, setName] = createSignal(getName());
+
 	const t = useT();
 
-	const name = "John12";
+	const interval = setInterval(() => {
+		setName(getName());
+	}, 1_000);
+
+	const date = () => Intl.DateTimeFormat(i18n.language).format(new Date());
+
+	onCleanup(() => clearInterval(interval));
+
+	console.log("date", date());
 
 	return (
 		<div>
 			asd
 			<p>
-				<Trans key="greeting" options={{ replace: { name } }}>
-					Welcome <span class="text-red-500">{"{{name}}"}</span>
-					<div>
-						lol <span>spanne1</span>
-					</div>
-					<span>never</span>
+				<Trans key="greeting">
+					Welcome <span class="text-red-500">{variable({ name })}</span>
+					.<br />
+					You will{" "}
+					<span class="font-bold">{variable({ action: t("action") })}</span>{" "}
+					believe what happens next. BTW THIS IS MISSING KEY...{" "}
+					{variable({ value: "<div>lol</div>" })}
+					<br />
+				</Trans>
+			</p>
+			<p>
+				<Trans key="currentDate">
+					Current date: <span>let me in</span>
 				</Trans>
 			</p>
 			<div class="flex gap-2">
@@ -30,7 +65,7 @@ export const App = () => {
 						i18n.changeLanguage("de");
 					}}
 				>
-					DE
+					<Trans key="lang:german">German</Trans>
 				</button>
 				<button
 					type="button"
@@ -38,7 +73,7 @@ export const App = () => {
 						i18n.changeLanguage("en");
 					}}
 				>
-					EN
+					<Trans key="lang:english">English</Trans>
 				</button>
 			</div>
 		</div>
