@@ -3,8 +3,10 @@ import {
 	type Component,
 	children,
 	createContext,
+	createEffect,
 	createMemo,
 	type JSX,
+	onCleanup,
 	Show,
 	useContext,
 } from "solid-js";
@@ -49,20 +51,13 @@ export const TranslatedJsx: Component<TranslatedJsxProps> = (props) => {
 				continue;
 			}
 
-			if (token.length === 2) {
+			if (token.length === 1 || token.length === 2) {
 				const [index, content] = token;
-				const element = elements[index];
+				let element = elements[index];
+				if (!element) continue;
 
-				element.textContent = content;
-				result.push(element);
-				continue;
-			}
-
-			if (token.length === 1) {
-				const [index] = token;
-				const element = elements[index];
-
-				element.textContent = "";
+				element = element.cloneNode(true);
+				element.textContent = content ?? "";
 				result.push(element);
 			}
 		}
@@ -77,22 +72,18 @@ export const TranslatedJsx: Component<TranslatedJsxProps> = (props) => {
 	);
 };
 
-export function variable(record: Record<string, unknown>): JSX.Element;
-export function variable(name: string, value?: unknown): JSX.Element;
-export function variable(
-	arg1: Record<string, unknown> | string,
-	arg2?: unknown,
-): JSX.Element {
+export const Variable: Component<{
+	name: string;
+	value?: JSX.Element;
+}> = (props) => {
 	const registerVariable = useContext(TranslateContext);
 
-	const [key, value] =
-		typeof arg1 === "string" ? [arg1, arg2] : Object.entries(arg1)[0];
-	const resolvedValue = typeof value === "function" ? value() : value;
+	createEffect(() => {
+		registerVariable?.(props.name, props.value);
+	});
 
-	registerVariable?.(key, resolvedValue);
-
-	return resolvedValue;
-}
+	return <>{props.value}</>;
+};
 
 //#region utils
 
@@ -100,6 +91,8 @@ const tokenizeRegex = /<(\d+)>(.*?)<\/\1>|<(\d+)\/>/g;
 type Token = string | [number, string] | [number];
 
 const tokenize = (input: string): Token[] => {
+	console.log(input, "in");
+
 	const result: Token[] = [];
 	let lastIndex = 0;
 	let match: RegExpExecArray | null = null;
@@ -113,7 +106,7 @@ const tokenize = (input: string): Token[] => {
 
 		if (match[1] !== undefined) {
 			// <n>text</n>
-			result.push([Number(match[1]), match[2]]);
+			result.push([Number(match[1]), match[2] ?? ""]);
 		} else if (match[3] !== undefined) {
 			// <n/>
 			result.push([Number(match[3])]);

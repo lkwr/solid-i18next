@@ -1,9 +1,10 @@
-import i18next, { type i18n, type TFunction } from "i18next";
+import i18next, { type i18n, type TFunction, type TOptions } from "i18next";
 import {
 	type Accessor,
 	type Component,
 	createContext,
 	createEffect,
+	createResource,
 	createSignal,
 	type JSX,
 	onCleanup,
@@ -45,8 +46,29 @@ export const useI18n = (): Accessor<i18n> => {
 };
 
 // Add suspense for loading?
-export const useT = (): TFunction => {
+export const useT = (options?: TOptions): TFunction => {
 	const i18n = useI18n();
 
-	return ((...args) => i18n().t(...args)) as TFunction;
+	const ns = () => options?.ns || i18n().options.defaultNS || "translation";
+
+	const [readyI18n] = createResource(
+		() => [i18n(), ns()] as const,
+		([currentI18n, currentNs]) => {
+			console.log(" Loading namespaces:", currentNs);
+
+			return currentI18n.loadNamespaces(currentNs).then(() => currentI18n);
+		},
+	);
+
+	const handler = (...args: Parameters<TFunction>) => {
+		console.log(" translating", ...args);
+
+		// TODO ensure lazy loaded namespaces are working with suspense
+
+		console.log(" i18n ready:", readyI18n.state);
+
+		return readyI18n()?.t(...args) ?? "";
+	};
+
+	return handler as TFunction;
 };

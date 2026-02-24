@@ -2,9 +2,11 @@
 
 import { render } from "solid-js/web";
 import "./style.css";
-import "./i18next.ts";
+import "./i18n.ts";
 import { App } from "./app.tsx";
 
 const root = document.getElementById("root");
 
-render(() => <App />, root!);
+if (!root) throw new Error("Root element not found");
+
+render(() => <App />, root);
