@@ -4,7 +4,9 @@ import resourcesToBackend from "i18next-resources-to-backend";
 i18next
 	.use(
 		resourcesToBackend(async (lng: string, ns: string) => {
-			await new Promise((resolve) => setTimeout(resolve, 5000)); // Simulate async loading
+			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async loading
+
+			console.log(` Loading language "${lng}" and namespace "${ns}"...`);
 
 			return import(`./locale/${lng}/${ns}.json`);
 		}),
@@ -12,6 +14,8 @@ i18next
 	.init({
 		lng: "en",
 		debug: true,
+		fallbackLng: "en",
+		supportedLngs: ["en", "de"],
 		interpolation: {
 			escapeValue: false,
 		},

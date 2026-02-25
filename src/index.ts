@@ -1,3 +1,11 @@
-export { I18nProvider, useI18n, useT } from "./context.tsx";
+export {
+	I18nextProvider,
+	type I18nextProviderProps,
+	useI18n,
+} from "./context.tsx";
 export { Trans, type TransProps } from "./trans.tsx";
-export { Variable } from "./translate-jsx.tsx";
+export {
+	type UseTranslationOptions,
+	type UseTranslationReturn,
+	useTranslation,
+} from "./use-translation.ts";

@@ -2,6 +2,6 @@
 	"greeting": "Welcome <0>{{name}}</0>.<1/>You will <2>{{action}}</2> believe what happens next.<3/> {{value}}",
 	"action": "never",
 	"currentDate": "Current date: <0>{{date, datetime}}</0>",
-	"missing_key": "This key exists in English but not in German. Variable: <0>{{name}}</0> and <0>{{name}}</0>",
+	"missing_key": "This key exists in English but not in German. Variable: <red>{{name}}</red> and <red>{{name}}</red>",
 	"current_lang": "Current language: {{lang}}"
 }
