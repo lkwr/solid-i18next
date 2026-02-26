@@ -2,11 +2,13 @@ import type { TFunction, TOptions } from "i18next";
 import { type Component, createMemo, type JSX } from "solid-js";
 import { useTranslation } from "./use-translation.ts";
 
+export type TransEmbeddedComponent = Component<{ children?: string }>;
+
 export type TransProps = {
 	key: string;
 	fallback?: string;
 
-	components?: Record<string, JSX.Element>;
+	components?: Record<string, TransEmbeddedComponent>;
 	replace?: TOptions["replace"];
 
 	t?: TFunction;
@@ -15,38 +17,39 @@ export type TransProps = {
 
 export const Trans: Component<TransProps> = (props) => {
 	const [contextT] = useTranslation(() => props.options?.ns);
-	const t: TFunction = props.t ?? contextT;
 
-	const mergedOptions = (): TOptions => ({
-		...props.options,
-		replace: { ...props.replace, ...props.options?.replace },
-		interpolation: { escapeValue: false, ...props.options?.interpolation },
-	});
+	const t = ((...args: Parameters<TFunction>) =>
+		props.t
+			? props.t(...(args as Parameters<TFunction>))
+			: contextT(...(args as Parameters<TFunction>))) as TFunction;
 
-	const nodes = createMemo<Record<string, Node>>(
-		() =>
-			Object.fromEntries(
-				Object.entries(props.components ?? {})
-					.map<[string, Node | undefined]>(([key, value]) => {
-						if (value instanceof Node) return [key, value];
-
-						console.warn(
-							`Component for key "${key}" is not a valid Node.`,
-							value,
-						);
-						return [key, undefined];
-					})
-					.filter(([_, node]) => node !== undefined),
-			) as Record<string, Node>,
+	const mergedOptions = createMemo(
+		(): TOptions => ({
+			...props.options,
+			replace: { ...props.replace, ...props.options?.replace },
+			interpolation: { escapeValue: false, ...props.options?.interpolation },
+		}),
 	);
 
-	const translated = () =>
-		props.fallback
-			? t(props.key, props.fallback, mergedOptions())
-			: t(props.key, mergedOptions());
+	const getComponent = (tag: string): TransEmbeddedComponent | undefined => {
+		const component = props.components?.[tag];
+		if (!component) {
+			console.warn(`No component found for tag "${tag}".`);
+			return undefined;
+		}
+
+		return component;
+	};
+
+	const translated = createMemo(() => {
+		const key = props.key;
+		const fallback = props.fallback;
+		const options = mergedOptions();
+
+		return fallback ? t(key, fallback, options) : t(key, options);
+	});
 
 	const transformed = createMemo((): JSX.Element[] => {
-		const currentNodes = nodes();
 		const currentTranslated = translated();
 
 		const result: JSX.Element[] = [];
@@ -58,12 +61,10 @@ export const Trans: Component<TransProps> = (props) => {
 			}
 
 			const [tag, content] = token;
-			let element = currentNodes[tag];
-			if (!element) continue;
+			const Component = getComponent(tag);
+			if (!Component) continue;
 
-			element = element.cloneNode(true);
-			element.textContent = content;
-			result.push(element);
+			result.push(<Component>{content}</Component>);
 		}
 
 		return result;

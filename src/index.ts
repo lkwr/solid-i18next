@@ -4,6 +4,7 @@ export {
 	useI18n,
 } from "./context.tsx";
 export { Trans, type TransProps } from "./trans.tsx";
+export { useLanguage } from "./use-language.ts";
 export {
 	type UseTranslationOptions,
 	type UseTranslationReturn,
