@@ -1,14 +1,18 @@
 {
 	"name": "solid-i18next",
-	"version": "0.1.0",
+	"version": "0.0.1",
 	"type": "module",
-	"description": "",
+	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Suspense support",
+	"exports": {
+		".": "./src/index.ts"
+	},
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && bun run ./build.ts",
 		"vite:build": "tsc && vite build",
 		"vite:preview": "vite preview",
-		"check": "bun biome check"
+		"check": "bun biome check",
+		"release": "bun run build && npm publish --access public ./dist"
 	},
 	"dependencies": {},
 	"peerDependencies": {
@@ -27,5 +31,24 @@
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1",
 		"vite-plugin-solid": "^2.11.10"
-	}
+	},
+	"license": "MIT",
+	"author": "Lukas Heizmann <lukas@heizmann.dev>",
+	"homepage": "https://github.com/lkwr/solid-i18next#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lkwr/solid-i18next.git"
+	},
+	"bugs": {
+		"url": "https://github.com/lkwr/solid-i18next/issues"
+	},
+	"keywords": [
+		"solid",
+		"solidjs",
+		"solid-js",
+		"i18next",
+		"i18n",
+		"internationalization",
+		"translation"
+	]
 }

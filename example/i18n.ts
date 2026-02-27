@@ -6,8 +6,6 @@ i18next
 		resourcesToBackend(async (lng: string, ns: string) => {
 			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async loading
 
-			console.log(` Loading language "${lng}" and namespace "${ns}"...`);
-
 			return import(`./locale/${lng}/${ns}.json`);
 		}),
 	)

@@ -56,8 +56,6 @@ export const App = () => {
 					Requested language: {requestedLanguage()}
 				</p>
 
-				<p>{t("lang:de", "fb", { ns: "lang" })}</p>
-
 				<div class="flex gap-2">
 					<button
 						class="p-2 bg-blue-500 text-white rounded-xl"
@@ -81,10 +79,15 @@ export const App = () => {
 						class="p-2 bg-blue-500 text-white rounded-xl"
 						type="button"
 						onClick={() => {
-							i18n().changeLanguage("lol");
+							// not exist language to test fallback
+							i18n().changeLanguage("fr");
 						}}
 					>
-						<Trans key="lang:lol" fallback="LOL not exist" t={t} />
+						<Trans
+							key="lang:fr"
+							fallback="French (fallback, not exist)"
+							t={t}
+						/>
 					</button>
 					<button
 						class="p-2 bg-blue-500 text-white rounded-xl"
