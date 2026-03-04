@@ -1,27 +1,41 @@
-import type { TFunction, TOptions } from "i18next";
+import type {
+	EffectiveKPrefix,
+	Namespace,
+	ParseKeys,
+	TFunction,
+	TOptions,
+} from "i18next";
 import { type Component, createMemo, type JSX } from "solid-js";
 import { useTranslation } from "./use-translation.ts";
 
 export type TransEmbeddedComponent = Component<{ children?: string }>;
 
-export type TransProps = {
-	key: string;
+export type TransProps<
+	Ns extends Namespace,
+	KPrefix = undefined,
+	TOpt extends TOptions = TOptions,
+> = {
+	key: ParseKeys<Ns, TOpt, EffectiveKPrefix<KPrefix, TOpt>>;
 	fallback?: string;
 
 	components?: Record<string, TransEmbeddedComponent>;
-	replace?: TOptions["replace"];
+	replace?: TOpt["replace"];
 
-	t?: TFunction;
-	options?: TOptions;
+	t?: TFunction<Ns, KPrefix>;
+	options?: TOpt;
 };
 
-export const Trans: Component<TransProps> = (props) => {
+export const Trans = <
+	Ns extends Namespace,
+	KPrefix = undefined,
+	TOpt extends TOptions = TOptions,
+>(
+	props: TransProps<Ns, KPrefix, TOpt>,
+): JSX.Element => {
 	const [contextT] = useTranslation(() => props.options?.ns);
 
 	const t = ((...args: Parameters<TFunction>) =>
-		props.t
-			? props.t(...(args as Parameters<TFunction>))
-			: contextT(...(args as Parameters<TFunction>))) as TFunction;
+		props.t ? props.t(...args) : contextT(...args)) as TFunction;
 
 	const mergedOptions = createMemo(
 		(): TOptions => ({
