@@ -1,3 +1,5 @@
 {
-	"welcome": "Willkommen, <bold>{{name}}</bold>!"
+	"nested": {
+		"welcome": "Willkommen, <bold>{{name}}</bold>!"
+	}
 }

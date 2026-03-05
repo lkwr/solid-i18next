@@ -1,21 +1,16 @@
-import type {
-	EffectiveKPrefix,
-	Namespace,
-	ParseKeys,
-	TFunction,
-	TOptions,
-} from "i18next";
+import type { Namespace, ParseKeys, TFunction, TOptions } from "i18next";
 import { type Component, createMemo, type JSX } from "solid-js";
 import { useTranslation } from "./use-translation.ts";
 
 export type TransEmbeddedComponent = Component<{ children?: string }>;
 
 export type TransProps<
+	Key extends ParseKeys<Ns, TOpt, KPrefix>,
 	Ns extends Namespace,
 	KPrefix = undefined,
 	TOpt extends TOptions = TOptions,
 > = {
-	key: ParseKeys<Ns, TOpt, EffectiveKPrefix<KPrefix, TOpt>>;
+	key: Key | Key[];
 	fallback?: string;
 
 	components?: Record<string, TransEmbeddedComponent>;
@@ -26,11 +21,12 @@ export type TransProps<
 };
 
 export const Trans = <
+	Key extends ParseKeys<Ns, TOpt, KPrefix>,
 	Ns extends Namespace,
 	KPrefix = undefined,
 	TOpt extends TOptions = TOptions,
 >(
-	props: TransProps<Ns, KPrefix, TOpt>,
+	props: TransProps<Key, Ns, KPrefix, TOpt>,
 ): JSX.Element => {
 	const [contextT] = useTranslation(() => props.options?.ns);
 
