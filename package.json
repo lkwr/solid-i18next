@@ -1,6 +1,6 @@
 {
 	"name": "solid-i18next",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"type": "module",
 	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Suspense support",
 	"exports": {
@@ -20,14 +20,14 @@
 		"solid-js": "^1.9.11"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.5",
+		"@biomejs/biome": "^2.4.6",
 		"@tailwindcss/vite": "^4.2.1",
-		"@types/bun": "^1.3.9",
-		"i18next": "^25.8.13",
+		"@types/bun": "^1.3.10",
+		"i18next": "^25.8.14",
 		"i18next-resources-to-backend": "^1.2.1",
 		"solid-js": "^1.9.11",
 		"tailwindcss": "^4.2.1",
-		"tsdown": "^0.20.3",
+		"tsdown": "^0.21.0",
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1",
 		"vite-plugin-solid": "^2.11.10"

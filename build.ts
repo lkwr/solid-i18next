@@ -27,7 +27,6 @@ const distPackageJson = {
 		},
 	},
 
-	dependencies: {},
 	peerDependencies: {
 		i18next: packageJson.devDependencies.i18next,
 		"solid-js": packageJson.devDependencies["solid-js"],
