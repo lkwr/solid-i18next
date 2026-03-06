@@ -41,7 +41,7 @@ export const App = () => {
 			<div class="flex flex-col gap-4">
 				<h1>
 					<Trans
-						key="welcome"
+						key="nested.welcome"
 						fallback="Welcome, <bold>{{name}}</bold> (<bold>fallback</bold>)!"
 						replace={{ name: name() }}
 						components={{
