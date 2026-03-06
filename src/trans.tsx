@@ -1,47 +1,62 @@
-import type { Namespace, ParseKeys, TFunction, TOptions } from "i18next";
+import type { i18n, Namespace, ParseKeys, TFunction, TOptions } from "i18next";
 import { type Component, createMemo, type JSX } from "solid-js";
 import { useTranslation } from "./use-translation.ts";
 
-export type TransEmbeddedComponent = Component<{ children?: string }>;
+export type TransComponent = Component<{ children?: string }>;
 
 export type TransProps<
 	Key extends ParseKeys<Ns, TOpt, KPrefix>,
 	Ns extends Namespace,
 	KPrefix = undefined,
+	TContext extends string | undefined = undefined,
 	TOpt extends TOptions = TOptions,
 > = {
 	key: Key | Key[];
-	fallback?: string;
+	defaultValue?: string;
+	count?: number;
+	context?: TContext;
+	replace?: Record<string, unknown>;
+	components?: Record<string, TransComponent>;
 
-	components?: Record<string, TransEmbeddedComponent>;
-	replace?: TOpt["replace"];
-
+	ns?: Ns;
 	t?: TFunction<Ns, KPrefix>;
-	options?: TOpt;
+	i18n?: i18n;
+	tOptions?: TOpt;
 };
 
 export const Trans = <
 	Key extends ParseKeys<Ns, TOpt, KPrefix>,
 	Ns extends Namespace,
 	KPrefix = undefined,
+	TContext extends string | undefined = undefined,
 	TOpt extends TOptions = TOptions,
 >(
-	props: TransProps<Key, Ns, KPrefix, TOpt>,
+	props: TransProps<Key, Ns, KPrefix, TContext, TOpt>,
 ): JSX.Element => {
-	const [contextT] = useTranslation(() => props.options?.ns);
+	const [contextT] = useTranslation(() => props.tOptions?.ns);
 
 	const t = ((...args: Parameters<TFunction>) =>
-		props.t ? props.t(...args) : contextT(...args)) as TFunction;
+		props.t
+			? props.t(...args)
+			: props.i18n
+				? props.i18n.t(...args)
+				: contextT(...args)) as TFunction;
 
 	const mergedOptions = createMemo(
 		(): TOptions => ({
-			...props.options,
-			replace: { ...props.replace, ...props.options?.replace },
-			interpolation: { escapeValue: false, ...props.options?.interpolation },
+			...props.tOptions,
+
+			ns: props.ns,
+			defaultValue: props.defaultValue ?? props.tOptions?.defaultValue,
+			count: props.count ?? props.count,
+			context: props.context ?? props.tOptions?.context,
+			replace: { ...props.replace, ...props.tOptions?.replace },
+
+			interpolation: { escapeValue: false, ...props.tOptions?.interpolation },
 		}),
 	);
 
-	const getComponent = (tag: string): TransEmbeddedComponent | undefined => {
+	const getComponent = (tag: string): TransComponent | undefined => {
 		const component = props.components?.[tag];
 		if (!component) {
 			console.warn(`No component found for tag "${tag}".`);
@@ -53,10 +68,10 @@ export const Trans = <
 
 	const translated = createMemo(() => {
 		const key = props.key;
-		const fallback = props.fallback;
 		const options = mergedOptions();
+		const defaultValue = options.defaultValue as string;
 
-		return fallback ? t(key, fallback, options) : t(key, options);
+		return defaultValue ? t(key, defaultValue, options) : t(key, options);
 	});
 
 	const transformed = createMemo((): JSX.Element[] => {

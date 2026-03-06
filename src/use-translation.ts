@@ -1,5 +1,3 @@
-// Add suspense for loading?
-
 import type { i18n, Namespace, TFunction } from "i18next";
 import { type Accessor, createMemo, createResource } from "solid-js";
 import { useI18n } from "./context.tsx";
@@ -44,8 +42,8 @@ export const useTranslation = <Ns extends Namespace, KPrefix = undefined>(
 
 		const defaultNs = i18n.options.defaultNS;
 
-		if (typeof defaultNs === "string") return [defaultNs];
 		if (Array.isArray(defaultNs)) return defaultNs;
+		if (typeof defaultNs === "string") return [defaultNs];
 
 		return ["translation"];
 	});

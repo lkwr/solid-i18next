@@ -1,6 +1,6 @@
 {
 	"name": "solid-i18next",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"type": "module",
 	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Suspense support",
 	"exports": {

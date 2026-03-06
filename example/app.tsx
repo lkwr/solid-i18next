@@ -42,7 +42,7 @@ export const App = () => {
 				<h1>
 					<Trans
 						key="nested.welcome"
-						fallback="Welcome, <bold>{{name}}</bold> (<bold>fallback</bold>)!"
+						defaultValue="Welcome, <bold>{{name}}</bold> (<bold>fallback</bold>)!"
 						replace={{ name: name() }}
 						components={{
 							bold: ({ children }) => <span class="font-bold">{children}</span>,
@@ -64,7 +64,7 @@ export const App = () => {
 							i18n().changeLanguage("de");
 						}}
 					>
-						<Trans key="lang:de" fallback="German (fallback)" t={t} />
+						<Trans key="lang:de" defaultValue="German (fallback)" t={t} />
 					</button>
 					<button
 						class="p-2 bg-blue-500 text-white rounded-xl"
@@ -73,7 +73,7 @@ export const App = () => {
 							i18n().changeLanguage("en");
 						}}
 					>
-						<Trans key="lang:en" fallback="English (fallback)" t={t} />
+						<Trans key="lang:en" defaultValue="English (fallback)" t={t} />
 					</button>
 					<button
 						class="p-2 bg-blue-500 text-white rounded-xl"
@@ -85,7 +85,7 @@ export const App = () => {
 					>
 						<Trans
 							key="lang:fr"
-							fallback="French (fallback, not exist)"
+							defaultValue="French (fallback, not exist)"
 							t={t}
 						/>
 					</button>
