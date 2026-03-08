@@ -3,7 +3,10 @@ import solid from "vite-plugin-solid";
 import packageJson from "./package.json" with { type: "json" };
 
 await build({
-	entry: "./src/index.ts",
+	entry: {
+		index: "./src/index.ts",
+		plugin: "./src/plugin.ts",
+	},
 	platform: "browser",
 	outDir: "./dist",
 	dts: true,
@@ -24,6 +27,10 @@ const distPackageJson = {
 		".": {
 			types: "./index.d.ts",
 			default: "./index.js",
+		},
+		"./plugin": {
+			types: "./plugin.d.ts",
+			default: "./plugin.js",
 		},
 	},
 

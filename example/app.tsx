@@ -24,9 +24,7 @@ const getName = () => names[Math.floor(Math.random() * names.length)];
 export const App = () => {
 	const [name, setName] = createSignal(getName());
 
-	const [namespaces, setNamespaces] = createSignal(["translation"]);
-
-	const [t, i18n] = useTranslation(namespaces);
+	const [t, i18n] = useTranslation(["translation"]);
 
 	const [currentLanguage, requestedLanguage] = useLanguage();
 
@@ -88,13 +86,6 @@ export const App = () => {
 							defaultValue="French (fallback, not exist)"
 							t={t}
 						/>
-					</button>
-					<button
-						class="p-2 bg-blue-500 text-white rounded-xl"
-						type="button"
-						onClick={() => setNamespaces((prev) => [...prev, "lang"])}
-					>
-						Add lang namespace dynamically
 					</button>
 				</div>
 			</div>
