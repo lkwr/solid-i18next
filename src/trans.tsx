@@ -71,7 +71,9 @@ export const Trans = <
 		const options = mergedOptions();
 		const defaultValue = options.defaultValue as string;
 
-		return defaultValue ? t(key, defaultValue, options) : t(key, options);
+		return defaultValue
+			? t(key, defaultValue, options)
+			: t(key, options as TOptions & { context?: never });
 	});
 
 	const transformed = createMemo((): JSX.Element[] => {
