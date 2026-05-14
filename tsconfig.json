@@ -7,7 +7,7 @@
 		"moduleDetection": "force",
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
-		"types": ["bun"],
+		"types": ["node"],
 
 		// Bundler mode
 		"moduleResolution": "nodenext",

@@ -1,3 +1,4 @@
+import { copyFile, writeFile } from "node:fs/promises";
 import { build } from "tsdown";
 import solid from "vite-plugin-solid";
 import packageJson from "./package.json" with { type: "json" };
@@ -27,10 +28,7 @@ const distPackageJson = {
 		},
 	},
 
-	peerDependencies: {
-		i18next: packageJson.devDependencies.i18next,
-		"solid-js": packageJson.devDependencies["solid-js"],
-	},
+	peerDependencies: packageJson.peerDependencies,
 
 	license: packageJson.license,
 	author: packageJson.author,
@@ -41,7 +39,7 @@ const distPackageJson = {
 };
 
 await Promise.all([
-	Bun.write("./dist/package.json", JSON.stringify(distPackageJson, null, 2)),
-	Bun.write("./dist/README.md", Bun.file("./README.md")),
-	Bun.write("./dist/LICENSE", Bun.file("./LICENSE")),
+	writeFile("./dist/package.json", JSON.stringify(distPackageJson, null, 2)),
+	copyFile("./README.md", "./dist/README.md"),
+	copyFile("./LICENSE", "./dist/LICENSE"),
 ]);

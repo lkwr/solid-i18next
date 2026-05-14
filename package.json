@@ -1,6 +1,6 @@
 {
 	"name": "solid-i18next",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"type": "module",
 	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Suspense support",
 	"exports": {
@@ -8,28 +8,27 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc && bun run ./build.ts",
+		"build": "tsc && node ./build.ts",
 		"vite:build": "tsc && vite build",
 		"vite:preview": "vite preview",
-		"check": "bun biome check",
-		"release": "bun run build && npm publish --access public ./dist"
+		"check": "biome check",
+		"release": "pnpm run build && pnpm publish --access public ./dist"
 	},
-	"dependencies": {},
 	"peerDependencies": {
 		"i18next": "^25.8.13 || ^26.0.0",
 		"solid-js": "^1.9.11"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.12",
-		"@tailwindcss/vite": "^4.2.3",
-		"@types/bun": "^1.3.12",
-		"i18next": "^26.0.6",
+		"@biomejs/biome": "^2.4.15",
+		"@tailwindcss/vite": "^4.3.0",
+		"@types/node": "^25.8.0",
+		"i18next": "^26.1.0",
 		"i18next-resources-to-backend": "^1.2.1",
 		"solid-js": "^1.9.12",
-		"tailwindcss": "^4.2.3",
-		"tsdown": "^0.21.9",
+		"tailwindcss": "^4.3.0",
+		"tsdown": "^0.22.0",
 		"typescript": "^6.0.3",
-		"vite": "^8.0.9",
+		"vite": "^8.0.13",
 		"vite-plugin-solid": "^2.11.12"
 	},
 	"license": "MIT",
