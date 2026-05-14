@@ -12,7 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - run: bun run check
-      - run: bun run build
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+      - run: pnpm ci
+      - run: pnpm run check
+      - run: pnpm run build
