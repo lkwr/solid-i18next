@@ -1,5 +1,6 @@
 import type { i18n, Namespace, ParseKeys, TFunction, TOptions } from "i18next";
 import { type Component, createMemo, type JSX } from "solid-js";
+import { tokenize } from "./tokenize.ts";
 import { useTranslation } from "./use-translation.ts";
 
 export type TransComponent = Component<{ children?: string }>;
@@ -48,7 +49,7 @@ export const Trans = <
 
 			ns: props.ns,
 			defaultValue: props.defaultValue ?? props.tOptions?.defaultValue,
-			count: props.count ?? props.count,
+			count: props.count ?? props.tOptions?.count,
 			context: props.context ?? props.tOptions?.context,
 			replace: { ...props.replace, ...props.tOptions?.replace },
 
@@ -99,41 +100,3 @@ export const Trans = <
 
 	return <>{transformed()}</>;
 };
-
-//#region utils
-
-const tokenizeRegex = /<(\w+)>(.*?)<\/\1>|<(\w+)\/>/g;
-type Token = string | [tag: string, content: string];
-
-const tokenize = (input: string): Token[] => {
-	const result: Token[] = [];
-	let lastIndex = 0;
-	let match: RegExpExecArray | null = null;
-
-	// biome-ignore lint/suspicious/noAssignInExpressions: cool
-	while ((match = tokenizeRegex.exec(input)) !== null) {
-		// Push text before the match
-		if (match.index > lastIndex) {
-			result.push(input.slice(lastIndex, match.index));
-		}
-
-		if (match[1] !== undefined) {
-			// <n>text</n>
-			result.push([match[1], match[2] ?? ""]);
-		} else if (match[3] !== undefined) {
-			// <n/>
-			result.push([match[3], ""]);
-		}
-
-		lastIndex = tokenizeRegex.lastIndex;
-	}
-
-	// Push remaining text
-	if (lastIndex < input.length) {
-		result.push(input.slice(lastIndex));
-	}
-
-	return result;
-};
-
-//#endregion

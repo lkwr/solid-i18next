@@ -3,6 +3,7 @@ export {
 	type I18nextProviderProps,
 	useI18n,
 } from "./context.tsx";
+export { type Token, tokenize } from "./tokenize.ts";
 export { Trans, type TransProps } from "./trans.tsx";
 export { useLanguage } from "./use-language.ts";
 export {
