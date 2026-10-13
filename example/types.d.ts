@@ -5,6 +5,7 @@
 
 // declare module "i18next" {
 // 	interface CustomTypeOptions {
+// 		enableSelector: true; // or "optimize"
 // 		defaultNS: "translation";
 // 		resources: {
 // 			lang: typeof lang;

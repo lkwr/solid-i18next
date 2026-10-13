@@ -1,5 +1,5 @@
 import type { i18n } from "i18next";
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { type Accessor, createEffect, createSignal } from "solid-js";
 import { useI18n } from "./context.tsx";
 
 export const useLanguage = (
@@ -9,10 +9,10 @@ export const useLanguage = (
 	const resolvedI18n = () => (i18n ? i18n() : contextI18n());
 
 	const [currentLanguage, setCurrentLanguage] = createSignal(
-		resolvedI18n().language,
+		() => resolvedI18n().language,
 	);
 	const [requestedLanguage, setRequestedLanguage] = createSignal(
-		resolvedI18n().language,
+		() => resolvedI18n().language,
 	);
 
 	const handleLanguageChanging = (lng: string) => {
@@ -24,16 +24,14 @@ export const useLanguage = (
 		setRequestedLanguage(lng);
 	};
 
-	createEffect(() => {
-		const currentI18n = resolvedI18n();
-
+	createEffect(resolvedI18n, (currentI18n) => {
 		currentI18n.on("languageChanging", handleLanguageChanging);
 		currentI18n.on("languageChanged", handleLanguageChanged);
 
-		onCleanup(() => {
+		return () => {
 			currentI18n.off("languageChanging", handleLanguageChanging);
 			currentI18n.off("languageChanged", handleLanguageChanged);
-		});
+		};
 	});
 
 	return [currentLanguage, requestedLanguage];

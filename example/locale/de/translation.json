@@ -1,5 +1,6 @@
 {
 	"nested": {
-		"welcome": "Willkommen, <bold>{{name}}</bold>!"
+		"welcome": "Willkommen, <bold>{{name}}</bold>!",
+		"components": "Hi, <a>das ist ein <b>verschachteltes</b> Komponent</a>!"
 	}
 }

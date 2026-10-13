@@ -1,14 +1,13 @@
 import { copyFile, writeFile } from "node:fs/promises";
 import { build } from "tsdown";
-import solid from "vite-plugin-solid";
 import packageJson from "./package.json" with { type: "json" };
 
 await build({
 	entry: "./src/index.ts",
 	platform: "browser",
 	outDir: "./dist",
+	outExtensions: () => ({ js: ".jsx", dts: ".d.ts" }),
 	dts: true,
-	plugins: [solid()],
 	format: "esm",
 });
 
@@ -18,13 +17,13 @@ const distPackageJson = {
 	description: packageJson.description,
 
 	type: "module",
-	module: "index.js",
+	module: "index.jsx",
 	types: "index.d.ts",
 
 	exports: {
 		".": {
 			types: "./index.d.ts",
-			default: "./index.js",
+			default: "./index.jsx",
 		},
 	},
 

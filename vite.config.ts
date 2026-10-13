@@ -1,16 +1,15 @@
+import solid from "@solidjs/vite-plugin";
 import tailwind from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import solid from "vite-plugin-solid";
 
 export default defineConfig({
-	plugins: [tailwind(), solid()],
-	build: {
-		target: "esnext",
-		rollupOptions: {
-			input: { app: "./example/index.html" },
-		},
-	},
-	server: {
-		open: "./example/index.html",
-	},
+	plugins: [
+		tailwind(),
+		solid({
+			start: {
+				app: "example/app.tsx",
+			},
+			ssr: false,
+		}),
+	],
 });

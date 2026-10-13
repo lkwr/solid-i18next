@@ -1,14 +1,27 @@
-import type { i18n, Namespace, ParseKeys, TFunction, TOptions } from "i18next";
-import { type Component, createMemo, type JSX } from "solid-js";
-import { tokenize } from "./tokenize.ts";
+import type {
+	i18n,
+	KeyPrefix,
+	Namespace,
+	ParseKeys,
+	TFunction,
+	TOptions,
+} from "i18next";
+import {
+	createMemo,
+	type Element,
+	type ParentComponent,
+	useContext,
+} from "solid-js";
+import { I18nextContext } from "./context.tsx";
+import { type Token, tokenize } from "./tokenize.ts";
 import { useTranslation } from "./use-translation.ts";
 
-export type TransComponent = Component<{ children?: string }>;
+export type TransComponent = ParentComponent;
 
 export type TransProps<
 	Key extends ParseKeys<Ns, TOpt, KPrefix>,
 	Ns extends Namespace,
-	KPrefix = undefined,
+	KPrefix extends KeyPrefix<Ns> = undefined,
 	TContext extends string | undefined = undefined,
 	TOpt extends TOptions = TOptions,
 > = {
@@ -17,7 +30,7 @@ export type TransProps<
 	count?: number;
 	context?: TContext;
 	replace?: Record<string, unknown>;
-	components?: Record<string, TransComponent>;
+	components?: Record<string, ParentComponent>;
 
 	ns?: Ns;
 	t?: TFunction<Ns, KPrefix>;
@@ -28,13 +41,14 @@ export type TransProps<
 export const Trans = <
 	Key extends ParseKeys<Ns, TOpt, KPrefix>,
 	Ns extends Namespace,
-	KPrefix = undefined,
+	KPrefix extends KeyPrefix<Ns> = undefined,
 	TContext extends string | undefined = undefined,
 	TOpt extends TOptions = TOptions,
 >(
 	props: TransProps<Key, Ns, KPrefix, TContext, TOpt>,
-): JSX.Element => {
+): Element => {
 	const [contextT] = useTranslation(() => props.tOptions?.ns);
+	const contextComponents = useContext(I18nextContext).components;
 
 	const t = ((...args: Parameters<TFunction>) =>
 		props.t
@@ -58,10 +72,10 @@ export const Trans = <
 	);
 
 	const getComponent = (tag: string): TransComponent | undefined => {
-		const component = props.components?.[tag];
+		const component = props.components?.[tag] ?? contextComponents()?.[tag];
 		if (!component) {
 			console.warn(`No component found for tag "${tag}".`);
-			return undefined;
+			return (props) => <>{props.children}</>;
 		}
 
 		return component;
@@ -77,26 +91,20 @@ export const Trans = <
 			: t(key, options as TOptions & { context?: never });
 	});
 
-	const transformed = createMemo((): JSX.Element[] => {
-		const currentTranslated = translated();
-
-		const result: JSX.Element[] = [];
-
-		for (const token of tokenize(currentTranslated)) {
-			if (typeof token === "string") {
-				result.push(token);
-				continue;
-			}
+	const renderTokens = (tokens: Token[]): Element[] =>
+		tokens.map((token): Element => {
+			if (typeof token === "string") return token;
 
 			const [tag, content] = token;
 			const Component = getComponent(tag);
-			if (!Component) continue;
+			if (!Component) return null;
 
-			result.push(<Component>{content}</Component>);
-		}
+			return <Component>{renderTokens(content)}</Component>;
+		});
 
-		return result;
-	});
+	const transformed = createMemo((): Element[] =>
+		renderTokens(tokenize(translated())),
+	);
 
 	return <>{transformed()}</>;
 };

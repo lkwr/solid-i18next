@@ -1,8 +1,8 @@
 {
 	"name": "solid-i18next",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"type": "module",
-	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Suspense support",
+	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Loading boundary support",
 	"exports": {
 		".": "./src/index.ts"
 	},
@@ -17,22 +17,25 @@
 		"release": "pnpm run build && pnpm publish --access public ./dist"
 	},
 	"peerDependencies": {
+		"@solidjs/web": "^2.0.0-rc.14",
 		"i18next": "^25.8.13 || ^26.0.0",
-		"solid-js": "^1.9.11"
+		"solid-js": "^2.0.0-rc.14"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.11",
+		"@biomejs/biome": "^2.5.15",
+		"@solidjs/diagnostics": "2.0.0-rc.2",
+		"@solidjs/vite-plugin": "^3.0.0-next.49",
+		"@solidjs/web": "^2.0.0-rc.14",
 		"@tailwindcss/vite": "^4.3.3",
-		"@types/node": "^26.4.0",
-		"i18next": "^26.4.0",
+		"@types/node": "^26.6.5",
+		"i18next": "^26.4.4",
 		"i18next-resources-to-backend": "^1.2.3",
-		"solid-js": "^1.9.15",
+		"solid-js": "^2.0.0-rc.14",
 		"tailwindcss": "^4.3.3",
-		"tsdown": "^0.22.14",
+		"tsdown": "^0.23.1",
 		"typescript": "^6.0.3",
-		"vite": "^8.2.2",
-		"vite-plugin-solid": "^2.11.14",
-		"vitest": "^4.1.11"
+		"vite": "^8.3.4",
+		"vitest": "^5.0.4"
 	},
 	"license": "MIT",
 	"author": "Lukas Heizmann <lukas@heizmann.dev>",
@@ -56,7 +59,7 @@
 	"devEngines": {
 		"runtime": {
 			"name": "node",
-			"version": "26.8.1",
+			"version": "26.11.1",
 			"onFail": "download"
 		}
 	}

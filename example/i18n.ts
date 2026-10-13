@@ -4,7 +4,7 @@ import resourcesToBackend from "i18next-resources-to-backend";
 i18next
 	.use(
 		resourcesToBackend(async (lng: string, ns: string) => {
-			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async loading
+			await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate async loading
 
 			return import(`./locale/${lng}/${ns}.json`);
 		}),

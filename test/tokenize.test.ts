@@ -11,39 +11,39 @@ describe("tokenize", () => {
 	});
 
 	it("parses a single open-close tag with content", () => {
-		expect(tokenize("<bold>text</bold>")).toEqual([["bold", "text"]]);
+		expect(tokenize("<bold>text</bold>")).toEqual([["bold", ["text"]]]);
 	});
 
 	it("parses a self-closing tag", () => {
-		expect(tokenize("<br/>")).toEqual([["br", ""]]);
+		expect(tokenize("<br/>")).toEqual([["br", []]]);
 	});
 
 	it("parses text before, between, and after tags", () => {
-		expect(tokenize("a<bold>b</bold>c")).toEqual(["a", ["bold", "b"], "c"]);
+		expect(tokenize("a<bold>b</bold>c")).toEqual(["a", ["bold", ["b"]], "c"]);
 	});
 
 	it("handles multiple consecutive tags with text between", () => {
 		expect(tokenize("a<x>b</x>c<y>d</y>e")).toEqual([
 			"a",
-			["x", "b"],
+			["x", ["b"]],
 			"c",
-			["y", "d"],
+			["y", ["d"]],
 			"e",
 		]);
 	});
 
 	it("handles multiple self-closing tags", () => {
-		expect(tokenize("<a/>b<c/>")).toEqual([["a", ""], "b", ["c", ""]]);
+		expect(tokenize("<a/>b<c/>")).toEqual([["a", []], "b", ["c", []]]);
 	});
 
 	it("handles empty content inside tags", () => {
-		expect(tokenize("<bold></bold>")).toEqual([["bold", ""]]);
+		expect(tokenize("<bold></bold>")).toEqual([["bold", []]]);
 	});
 
 	it("handles interpolation placeholders as plain text", () => {
 		expect(tokenize("Hello <bold>{{name}}</bold>!")).toEqual([
 			"Hello ",
-			["bold", "{{name}}"],
+			["bold", ["{{name}}"]],
 			"!",
 		]);
 	});
@@ -54,7 +54,7 @@ describe("tokenize", () => {
 	});
 
 	it("handles tags with digits in the name", () => {
-		expect(tokenize("<h1>Title</h1>")).toEqual([["h1", "Title"]]);
+		expect(tokenize("<h1>Title</h1>")).toEqual([["h1", ["Title"]]]);
 	});
 
 	it("does not match a closing tag without a matching opener as a tag", () => {
@@ -63,17 +63,53 @@ describe("tokenize", () => {
 	});
 
 	it("treats unclosed tags as plain text", () => {
-		// "<bold>no close" — the regex requires a closing tag, so this stays text
+		// no closer exists, so the opener degrades to literal text
 		expect(tokenize("<bold>no close")).toEqual(["<bold>no close"]);
 	});
 
-	// Known limitation: nested tags are not recursively parsed (documented in TODO.md).
-	// The outer tag matches and the inner tag is captured as raw content, not
-	// tokenized separately. This test pins the current behavior.
-	it("does NOT recursively parse nested tags (known limitation)", () => {
-		const result = tokenize("<a><b>x</b></a>");
-		// <a>...</a> matches with the inner <b>x</b> captured as content text.
-		expect(result).toEqual([["a", "<b>x</b>"]]);
+	it("parses nested tags recursively", () => {
+		expect(tokenize("<a><b>x</b></a>")).toEqual([["a", [["b", ["x"]]]]]);
+	});
+
+	it("parses deeply nested tags", () => {
+		expect(tokenize("<a><b><c>x</c></b></a>")).toEqual([
+			["a", [["b", [["c", ["x"]]]]]],
+		]);
+	});
+
+	it("interleaves text and tags at any depth", () => {
+		expect(tokenize("<a>x<b>y</b>z</a>")).toEqual([
+			["a", ["x", ["b", ["y"]], "z"]],
+		]);
+	});
+
+	it("nests tags with the same name", () => {
+		expect(tokenize("<b>1<b>2</b>3</b>")).toEqual([
+			["b", ["1", ["b", ["2"]], "3"]],
+		]);
+	});
+
+	it("degrades a nested unclosed tag to text", () => {
+		// <b> is never closed, so its opener stays text while <a> still matches
+		expect(tokenize("<a><b>x</a>")).toEqual([["a", ["<b>x"]]]);
+	});
+
+	it("keeps the outer tag when a closer does not match", () => {
+		expect(tokenize("<a>x</b></a>")).toEqual([["a", ["x</b>"]]]);
+	});
+
+	it("degrades an unclosed nested tag with a wrong inner closer", () => {
+		expect(tokenize("<a><b>x</c></a>")).toEqual([["a", ["<b>x</c>"]]]);
+	});
+
+	it("pins behavior for crossed tags", () => {
+		// malformed input: <b> swallows the </a> closer as text, so the outer
+		// <a> degrades and <b> ends up as the top-level tag
+		expect(tokenize("<a><b>x</a></b>")).toEqual(["<a>", ["b", ["x</a>"]]]);
+	});
+
+	it("keeps self-closing tags inside unclosed tags tokenized", () => {
+		expect(tokenize("<a><br/>")).toEqual(["<a>", ["br", []]]);
 	});
 });
 
@@ -91,11 +127,11 @@ describe("tokenize types", () => {
 		}
 	});
 
-	it("tuple tokens are [string, string]", () => {
+	it("tuple tokens are [string, Token[]]", () => {
 		const tokens = tokenize("<a>b</a>");
 		for (const token of tokens) {
 			if (typeof token !== "string") {
-				expectTypeOf(token).toEqualTypeOf<[string, string]>();
+				expectTypeOf(token).toEqualTypeOf<[string, Token[]]>();
 			}
 		}
 	});

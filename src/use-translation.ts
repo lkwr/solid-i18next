@@ -1,5 +1,5 @@
-import type { i18n, Namespace, TFunction } from "i18next";
-import { type Accessor, createMemo, createResource } from "solid-js";
+import type { i18n, KeyPrefix, Namespace, TFunction } from "i18next";
+import { type Accessor, createMemo, isPending, NotReadyError } from "solid-js";
 import { useI18n } from "./context.tsx";
 import { useLanguage } from "./use-language.ts";
 
@@ -11,12 +11,14 @@ export type UseTranslationReturn<Ns extends Namespace, KPrefix> = [
 
 export type UseTranslationOptions<KPrefix> = {
 	i18n?: i18n;
-	useSuspense?: boolean;
 	keyPrefix?: KPrefix;
 	lng?: string;
 };
 
-export const useTranslation = <Ns extends Namespace, KPrefix = undefined>(
+export const useTranslation = <
+	Ns extends Namespace,
+	KPrefix extends KeyPrefix<Ns> = undefined,
+>(
 	ns?: Ns | Accessor<Ns | undefined> | undefined,
 	options?:
 		| UseTranslationOptions<KPrefix>
@@ -45,59 +47,53 @@ export const useTranslation = <Ns extends Namespace, KPrefix = undefined>(
 		if (Array.isArray(defaultNs)) return defaultNs;
 		if (typeof defaultNs === "string") return [defaultNs];
 
-		return ["translation"];
+		return [];
 	});
 
 	const [currentLanguage, requestedLanguage] = useLanguage(() =>
 		resolvedI18n(),
 	);
 
-	const [internalReady] = createResource(
-		() => ({
-			i18n: resolvedI18n(),
-			namespaces: resolvedNs(),
-			currentLanguage: currentLanguage(),
-			requestedLanguage: requestedLanguage(),
-		}),
-		async ({ i18n, namespaces, currentLanguage, requestedLanguage }) => {
+	const tAccessor = createMemo<TFunction>(
+		async () => {
+			const options = resolvedOptions();
+			const i18n = resolvedI18n();
+			const namespaces = resolvedNs();
+			const currentLng = currentLanguage();
+			const requestedLng = options.lng ?? requestedLanguage();
+
 			const missingNamespaces = namespaces.filter(
 				(namespace) =>
-					!i18n.hasLoadedNamespace(namespace, { lng: requestedLanguage }),
+					!i18n.hasLoadedNamespace(namespace, { lng: requestedLng }),
 			);
 
-			if (requestedLanguage !== currentLanguage) {
-				await i18n.loadLanguages(requestedLanguage);
+			// Load language on language change
+			if (currentLng !== requestedLng) {
+				await i18n.loadLanguages(requestedLng);
 			}
 
+			// Load missing namespaces
 			if (missingNamespaces.length > 0) {
 				await i18n.loadNamespaces(missingNamespaces);
 			}
 
-			return true;
+			return i18n.getFixedT(requestedLng, namespaces, options.keyPrefix);
 		},
-		{ initialValue: false },
+		{ equals: false },
 	);
 
-	const trackRetranslate = () => [
-		requestedLanguage(),
-		currentLanguage(),
-		internalReady.state,
-	];
-
 	const t = (...args: Parameters<TFunction<Ns, KPrefix>>) => {
-		// track retranslation dependencies
-		trackRetranslate();
-
-		// trigger suspense when enabled
-		if (resolvedOptions().useSuspense !== false) internalReady();
-
-		return resolvedI18n().t(...args);
+		const tFn = tAccessor();
+		return tFn(...args);
 	};
 
 	const ready = () => {
-		if (resolvedOptions().useSuspense === false)
-			return !internalReady.loading && internalReady.latest;
-		return internalReady();
+		try {
+			return !isPending(() => tAccessor());
+		} catch (error) {
+			if (error instanceof NotReadyError) return false;
+			throw error;
+		}
 	};
 
 	return [t as TFunction<Ns, KPrefix>, resolvedI18n, ready];

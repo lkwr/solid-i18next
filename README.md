@@ -57,6 +57,19 @@ import { Trans } from "solid-i18next";
   components={{
     bold: ({ children }) => <strong>{children}</strong>,
   }}
+/>;
+```
+
+Tags can nest arbitrarily deep and are resolved recursively:
+
+```tsx
+// Translation: "Read the <link><bold>docs</bold></link>"
+<Trans
+  key="cta"
+  components={{
+    link: ({ children }) => <a href="/docs">{children}</a>,
+    bold: ({ children }) => <strong>{children}</strong>,
+  }}
 />
 ```
 
@@ -67,17 +80,17 @@ import { I18nextProvider } from "solid-i18next";
 
 <I18nextProvider i18n={i18next}>
   <App />
-</I18nextProvider>
+</I18nextProvider>;
 ```
 
 ## API
 
-| Export | Description |
-|---|---|
-| `useTranslation(ns?, options?)` | Returns `[t, i18n, ready]`. Loads namespaces reactively and supports Suspense. |
-| `Trans` | Component for translations with embedded JSX via `components` prop. |
-| `I18nextProvider` | Context provider to supply a custom i18next instance. |
-| `useI18n` | Access the i18next instance from context. |
+| Export                          | Description                                                                                                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useTranslation(ns?, options?)` | Returns `[t, i18n, ready]`. Loads namespaces reactively with Solid 2 async boundaries.                                                                                             |
+| `Trans`                         | Component for translations with embedded JSX via `components` prop.                                                                                                                |
+| `I18nextProvider`               | Context provider to supply a custom i18next instance and global <Trans /> components. Nested providers inherit components by default; pass `inheritComponents={false}` to opt out. |
+| `useI18n`                       | Access the i18next instance from context.                                                                                                                                          |
 
 ## Contributing
 

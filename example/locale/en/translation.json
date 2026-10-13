@@ -1,5 +1,6 @@
 {
 	"nested": {
-		"welcome": "Welcome, <bold>{{name}}</bold>!"
+		"welcome": "Welcome, <bold>{{name}}</bold>!",
+		"components": "Hi, <a>this is a <b>nested</b> component</a>!"
 	}
 }
