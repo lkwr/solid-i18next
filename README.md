@@ -2,7 +2,7 @@
 
 > **Experimental** - This library is still in early development. APIs may change and things might be buggy.
 
-[i18next](https://www.i18next.com/) integration for [Solid.js](https://www.solidjs.com/) with reactive hooks, a `<Trans>` component, and built-in Suspense support.
+[i18next](https://www.i18next.com/) integration for [Solid.js](https://www.solidjs.com/) with reactive hooks, a `<Trans>` component, and built-in Loading boundary support.
 
 ## Install
 

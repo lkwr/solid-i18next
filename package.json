@@ -1,6 +1,6 @@
 {
 	"name": "solid-i18next",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"type": "module",
 	"description": "i18next integration for Solid.js with reactive hooks, a Trans component, and built-in Loading boundary support",
 	"exports": {
@@ -17,7 +17,6 @@
 		"release": "pnpm run build && pnpm publish --access public ./dist"
 	},
 	"peerDependencies": {
-		"@solidjs/web": "^2.0.0-rc.14",
 		"i18next": "^25.8.13 || ^26.0.0",
 		"solid-js": "^2.0.0-rc.14"
 	},
