@@ -55,29 +55,44 @@ export const useTranslation = <
 	);
 
 	const tAccessor = createMemo<TFunction>(
-		async () => {
+		() => {
 			const options = resolvedOptions();
 			const i18n = resolvedI18n();
 			const namespaces = resolvedNs();
 			const currentLng = currentLanguage();
 			const requestedLng = options.lng ?? requestedLanguage();
 
+			const getT = () =>
+				i18n.getFixedT(requestedLng, namespaces, options.keyPrefix);
+
 			const missingNamespaces = namespaces.filter(
 				(namespace) =>
 					!i18n.hasLoadedNamespace(namespace, { lng: requestedLng }),
 			);
 
-			// Load language on language change
-			if (currentLng !== requestedLng) {
-				await i18n.loadLanguages(requestedLng);
+			const load = async () => {
+				// Load language on language change
+				if (currentLng !== requestedLng) {
+					await i18n.loadLanguages(requestedLng);
+				}
+
+				// Load missing namespaces
+				if (missingNamespaces.length > 0) {
+					await i18n.loadNamespaces(missingNamespaces);
+				}
+
+				return getT();
+			};
+
+			// Everything is loaded: resolve synchronously. An async memo is
+			// pending on its first read, which would render empty translations
+			// (or hold the surrounding Loading boundary/transition) even though
+			// nothing has to be loaded.
+			if (currentLng === requestedLng && missingNamespaces.length === 0) {
+				return getT();
 			}
 
-			// Load missing namespaces
-			if (missingNamespaces.length > 0) {
-				await i18n.loadNamespaces(missingNamespaces);
-			}
-
-			return i18n.getFixedT(requestedLng, namespaces, options.keyPrefix);
+			return load();
 		},
 		{ equals: false },
 	);
