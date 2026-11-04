@@ -18,12 +18,12 @@ npm install solid-i18next i18next
 import i18next from "i18next";
 
 i18next.init({
-  lng: "en",
-  fallbackLng: "en",
-  resources: {
-    en: { translation: { welcome: "Welcome, <bold>{{name}}</bold>!" } },
-    de: { translation: { welcome: "Willkommen, <bold>{{name}}</bold>!" } },
-  },
+	lng: "en",
+	fallbackLng: "en",
+	resources: {
+		en: { translation: { welcome: "Welcome, <bold>{{name}}</bold>!" } },
+		de: { translation: { welcome: "Willkommen, <bold>{{name}}</bold>!" } },
+	},
 });
 ```
 
@@ -33,14 +33,14 @@ i18next.init({
 import { useTranslation } from "solid-i18next";
 
 function App() {
-  const [t, i18n] = useTranslation();
+	const [t, i18n] = useTranslation();
 
-  return (
-    <div>
-      <p>{t("welcome", { name: "Alice" })}</p>
-      <button onClick={() => i18n().changeLanguage("de")}>Deutsch</button>
-    </div>
-  );
+	return (
+		<div>
+			<p>{t("welcome", { name: "Alice" })}</p>
+			<button onClick={() => i18n().changeLanguage("de")}>Deutsch</button>
+		</div>
+	);
 }
 ```
 
@@ -52,11 +52,11 @@ Use `<Trans>` to embed components inside translations:
 import { Trans } from "solid-i18next";
 
 <Trans
-  key="welcome"
-  replace={{ name: "Alice" }}
-  components={{
-    bold: ({ children }) => <strong>{children}</strong>,
-  }}
+	key="welcome"
+	replace={{ name: "Alice" }}
+	components={{
+		bold: ({ children }) => <strong>{children}</strong>,
+	}}
 />;
 ```
 
@@ -65,12 +65,12 @@ Tags can nest arbitrarily deep and are resolved recursively:
 ```tsx
 // Translation: "Read the <link><bold>docs</bold></link>"
 <Trans
-  key="cta"
-  components={{
-    link: ({ children }) => <a href="/docs">{children}</a>,
-    bold: ({ children }) => <strong>{children}</strong>,
-  }}
-/>
+	key="cta"
+	components={{
+		link: ({ children }) => <a href="/docs">{children}</a>,
+		bold: ({ children }) => <strong>{children}</strong>,
+	}}
+/>;
 ```
 
 ### Provide a custom i18next instance
@@ -79,7 +79,7 @@ Tags can nest arbitrarily deep and are resolved recursively:
 import { I18nextProvider } from "solid-i18next";
 
 <I18nextProvider i18n={i18next}>
-  <App />
+	<App />
 </I18nextProvider>;
 ```
 
